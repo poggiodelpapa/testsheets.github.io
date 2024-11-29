@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Generatore di numeri casuali senza ripetizione</title>
+<style>
+    body, td, th {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 12px;
+    }
+    .titolo {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 22px;
+        color: #FF0000;
+        font-weight: bold;
+    }
+    .titoletto {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        color: #FF0000;
+        font-weight: bold;
+    }
+    .bottone {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 14px;
+        line-height: 45px;
+        background-color: #FFFFFF;
+        color: #000000;
+        background-image: url(immagini-dice.png);
+    }
+    #risultato {
+        display: none;
+    }
+</style>
+<script>
+    // URL del tuo Google Apps Script
+    const API_URL = "https://script.google.com/macros/s/AKfycbxv8ZkfAI5f0EmOYrzkeBTjRWQAIC2umUcivxlB8wan4UVo0hBzrlf4sKJpD0U6GVoEww/exec";
+
+    async function generaNumeri() {
+        const max = parseInt(document.getElementById('max').value);
+        if (isNaN(max) || max <= 0) {
+            alert("Inserisci un numero valido.");
+            return;
+        }
+
+        // Mostra un messaggio di caricamento
+        document.getElementById('risultato').style.display = 'none';
+        document.getElementById('risultato').innerHTML = "<p>Caricamento...</p>";
+        document.getElementById('risultato').style.display = 'block';
+
+        try {
+            // Invia la richiesta al backend
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ max }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Errore nella comunicazione con il server.");
+            }
+
+            const data = await response.json();
+            if (data.success) {
+                // Mostra i numeri generati
+                let risultato = "";
+                data.lista.forEach((numero, index) => {
+                    risultato += (index + 1) + ") numero estratto " + numero + "<br>";
+                });
+
+                document.getElementById('risultato').innerHTML = risultato;
+            } else {
+                alert(data.error || "Errore sconosciuto.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Si è verificato un errore. Riprova più tardi.");
+        }
+    }
+</script>
+</head>
+<body>
+    <form name="form1" onsubmit="event.preventDefault(); generaNumeri();">
+        <table width="100%" cellpadding="10" bgcolor="#FFFFFF">
+            <tr align="center" valign="middle">
+                <td colspan="2">
+                    <table width="100%" border="0">
+                        <tr>
+                            <td width="3%">
+                                <img src="immagini-dice.png" width="52" height="50">
+                            </td>
+                            <td width="93%" align="center" valign="middle" class="titolo">
+                                Generatore di numeri casuali senza ripetizione
+                            </td>
+                            <td width="4%">
+                                <img src="immagini-dice.png" width="52" height="50">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td width="28%">Numero massimo da generare</td>
+                <td width="72%">
+                    <input id="max" name="max" type="text" size="10" maxlength="4">
+                </td>
+            </tr>
+            <tr>
+                <td valign="top">Numeri casuali generati </td>
+                <td id="risultato"></td>
+            </tr>
+            <tr bgcolor="#FF0000">
+                <td colspan="2" align="center" valign="middle">
+                    <input name="Submit" type="image" src="esercizi_svolti_HTML/immagini/dice.gif" alt="Genera numeri random" align="absmiddle" onclick="generaNumeri()">
+                </td>
+            </tr>
+        </table>
+    </form>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td height="73" align="center" valign="middle">
+                <form name="form2">
+                    <input name="Submit2" type="button" class="titoletto" value="Torna indietro" onclick="history.back();">
+                </form>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
